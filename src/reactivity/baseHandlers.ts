@@ -1,12 +1,13 @@
-import { isObject } from "../shared";
+import { extend, isObject } from "../shared";
 import { track, trigger } from "./effect";
-import { ReactiveFlags, reactive, readonly } from "./reactive";
+import { ReactiveFlags, reactive, readonly, shallowReadonly } from "./reactive";
 
 const get = createGetter();
 const set = createSetter();
 const readonlyGet = createGetter(true);
+const shallowReadonlyGet = createGetter(true, true);
 
-function createGetter(isReadOnly = false) {
+function createGetter(isReadOnly = false, shallow = false) {
   return function get(target, key) {
     if (key === ReactiveFlags.IS_REACTIVE) {
       return !isReadOnly;
@@ -15,6 +16,11 @@ function createGetter(isReadOnly = false) {
     }
 
     const res = Reflect.get(target, key);
+
+    // 判斷是否為 shallow 類型
+    if (shallow) {
+      return res;
+    }
 
     // 判斷 res 是否為物件
     if (isObject(res)) {
@@ -51,3 +57,7 @@ export const readonlyHandlers = {
     return true;
   },
 };
+
+export const shallowReadonlyHandlers = extend({}, readonlyHandlers, {
+  get: shallowReadonlyGet,
+});
