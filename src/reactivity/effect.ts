@@ -1,5 +1,9 @@
 import { extend } from "../shared";
 
+let activeEffect;
+let shouldTrack;
+const targetMap = new Map();
+
 class ReactiveEffect {
   private _fn: any;
   deps = [];
@@ -10,8 +14,17 @@ class ReactiveEffect {
   }
 
   run() {
+    if (!this.active) {
+      return this._fn();
+    }
+
+    shouldTrack = true;
     activeEffect = this;
-    return this._fn();
+
+    const result = this._fn();
+    shouldTrack = false;
+
+    return result;
   }
 
   stop() {
@@ -31,7 +44,6 @@ function cleanupEffect(effect) {
   });
 }
 
-const targetMap = new Map();
 export function track(target, key) {
   // 收集依賴關係圖 target -> key -> dep
   let depsMap = targetMap.get(target);
@@ -48,13 +60,13 @@ export function track(target, key) {
   }
 
   if (!activeEffect) return;
+  if (!shouldTrack) return;
 
   // 收集依賴
   dep.add(activeEffect);
   activeEffect.deps.push(dep);
 }
 
-let activeEffect;
 export function effect(fn, options: any = {}) {
   const _effect = new ReactiveEffect(fn, options.scheduler);
   extend(_effect, options);
