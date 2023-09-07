@@ -42,9 +42,16 @@ function cleanupEffect(effect) {
   effect.deps.forEach((dep: any) => {
     dep.delete(effect);
   });
+  effect.deps.length = 0;
+}
+
+function isTracking() {
+  return shouldTrack && activeEffect !== undefined;
 }
 
 export function track(target, key) {
+  if (!isTracking()) return;
+
   // 收集依賴關係圖 target -> key -> dep
   let depsMap = targetMap.get(target);
   // 初始化時depsMap不存在的情況
@@ -59,10 +66,8 @@ export function track(target, key) {
     depsMap.set(key, dep);
   }
 
-  if (!activeEffect) return;
-  if (!shouldTrack) return;
-
   // 收集依賴
+  if (dep.has(activeEffect)) return;
   dep.add(activeEffect);
   activeEffect.deps.push(dep);
 }
