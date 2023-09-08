@@ -45,7 +45,7 @@ function cleanupEffect(effect) {
   effect.deps.length = 0;
 }
 
-function isTracking() {
+export function isTracking() {
   return shouldTrack && activeEffect !== undefined;
 }
 
@@ -66,6 +66,10 @@ export function track(target, key) {
     depsMap.set(key, dep);
   }
 
+  trackEffects(dep);
+}
+
+export function trackEffects(dep) {
   // 收集依賴
   if (dep.has(activeEffect)) return;
   dep.add(activeEffect);
@@ -87,6 +91,10 @@ export function trigger(target, key) {
   let depsMap = targetMap.get(target);
   let dep = depsMap.get(key);
 
+  triggerEffects(dep);
+}
+
+export function triggerEffects(dep) {
   for (let effect of dep) {
     if (effect.scheduler) {
       effect.scheduler();
