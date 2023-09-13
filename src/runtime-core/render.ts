@@ -7,6 +7,9 @@ export function render(vnode, container) {
 
 function patch(vnode, container) {
   // 處理組件
+  // 判斷vnode是不是element
+  // processElement();
+
   processComponent(vnode, container);
 }
 
