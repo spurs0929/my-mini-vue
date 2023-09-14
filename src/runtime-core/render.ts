@@ -9,8 +9,38 @@ function patch(vnode, container) {
   // 處理組件
   // 判斷vnode是不是element
   // processElement();
+  if (typeof vnode.type === "string") {
+    processElement(vnode, container);
+  } else {
+    processComponent(vnode, container);
+  }
+}
 
-  processComponent(vnode, container);
+function processElement(vnode: any, container: any) {
+  mountElement(vnode, container);
+}
+
+function mountElement(vnode: any, container: any) {
+  const el = document.createElement(vnode.type);
+
+  const { children, props } = vnode;
+  if (typeof children === "string") {
+    el.textContent = children;
+  } else if (Array.isArray(children)) {
+    mountChildren(vnode, container);
+  }
+
+  for (const key in props) {
+    const val = props[key];
+    el.setAttribute(key, val);
+  }
+  container.append(el);
+}
+
+function mountChildren(vnode, container) {
+  vnode.children.forEach((v) => {
+    patch(v, container);
+  });
 }
 
 function processComponent(vnode: any, container: any) {
