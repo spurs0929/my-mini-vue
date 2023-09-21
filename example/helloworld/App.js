@@ -9,6 +9,12 @@ export const App = {
       {
         id: "root",
         class: ["test", "red"],
+        onClick() {
+          console.log("click !!!");
+        },
+        onMousemove() {
+          console.log("Mousemove ~");
+        },
       },
       "hi, " + this.msg
       // [h("p", { class: "purple" }, "hi"), h("p", { class: "blue" }, "mini-vue")]
