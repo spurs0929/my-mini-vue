@@ -20,7 +20,6 @@ export function createComponentInstanse(vnode) {
 }
 
 export function setupComponent(instance) {
-  // TODO
   initProps(instance, instance.vnode.props);
   initSlots(instance, instance.vnode.children);
   // 處理調用setup()後的返回值
