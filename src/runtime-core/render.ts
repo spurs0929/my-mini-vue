@@ -1,5 +1,6 @@
 import { ShapeFlags } from "../shared/ShapeFlags";
 import { createComponentInstanse, setupComponent } from "./component";
+import { Fragment } from "./vnode";
 
 export function render(vnode, container) {
   // 調用patch方法
@@ -10,11 +11,17 @@ function patch(vnode, container) {
   // 處理組件
   // 判斷vnode是不是element
   // processElement();
-  const { shapeFlag } = vnode;
-  if (shapeFlag & ShapeFlags.ELEMENT) {
-    processElement(vnode, container);
-  } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
-    processComponent(vnode, container);
+  const { type, shapeFlag } = vnode;
+  switch (type) {
+    case Fragment:
+      processFragment(vnode, container);
+      break;
+    default:
+      if (shapeFlag & ShapeFlags.ELEMENT) {
+        processElement(vnode, container);
+      } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+        processComponent(vnode, container);
+      }
   }
 }
 
@@ -69,4 +76,7 @@ function setupRenderEffect(instance: any, initialVnode, container: any) {
   patch(subTree, container);
 
   initialVnode.el = subTree.el;
+}
+function processFragment(vnode: any, container: any) {
+  mountChildren(vnode, container);
 }
